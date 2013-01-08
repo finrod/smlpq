@@ -1,0 +1,47 @@
+(* Target only containing the interface and client functor.
+   This is still dependent on MLton basis, at least until a basis meta-package
+   is added.
+   Can be useful for typechecking client functors or implementing a different
+   set of bindings. *)
+target interface
+
+  sources
+    $(SML_LIB)/basis/basis.mlb
+    sql_driver.sig
+    sql_client.sig
+    sql_client.sml
+  end
+
+  (* This target adds various MLton-specific dependencies: basis, MLton's ffi,
+     and some utilities *)
+  target mlton
+    option compiler = mlton
+
+    sources
+      $(SML_LIB)/basis/mlton.mlb
+      util.sml
+    end
+
+    (* The following two targets provide the actual implementations for
+       PostgreSQL and SQLite respectively *)
+    target pq
+      sources
+        pq.sml
+      end
+      ffi
+        lnkopt -lpq
+      end
+    end
+
+    target sqlite
+      sources
+        sqlite.sml
+      end
+      ffi
+        lnkopt -lsqlite3
+      end
+    end
+
+  end
+
+end
